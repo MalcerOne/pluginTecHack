@@ -1,1 +1,1 @@
-# pluginTecHack
+# Plugin para Mozila Firefox
