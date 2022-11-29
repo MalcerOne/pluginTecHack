@@ -1,34 +1,34 @@
 {
-    "manifest_version": 2,
-    "name": "PrivacyExtension",
-    "version": "1.0",
-  
-    "description": "Detection of privacy violations, possible attacks and other security issues in a web client.",
-  
-    "icons": {
-      "48": "icons/privacy_icon.png"
-    },
-  
-    "content_scripts": [
-      {
-        "matches": ["*://*/*"],
-        "js": ["privacyPlugin.js"]
-      }
-    ],
+  "manifest_version": 2,
+  "name": "PrivacyExtension",
+  "version": "1.0",
 
-    "browser_action": {
-        "default_title": "Detection of privacy violations, possible attacks and other security issues in a web client.",
-        "default_popup": "extension.html",
-        "browser_style": true
-    },
+  "description": "Detection of privacy violations, possible attacks and other security issues in a web client.",
 
-    "permissions": [
-        "cookies",
-        "<all_urls>",
-        "tabs",
-        "storage",
-        "http://*/*",
-        "https://*/*"
-    ]  
+  "icons": {
+    "48": "icons/privacy_icon.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["privacyPlugin.js"]
+    }
+  ],
+
+  "browser_action": {
+      "default_title": "PrivacyExtension",
+      "default_popup": "extension.html",
+      "browser_style": true
+  },
+
+  "permissions": [
+      "cookies",
+      "<all_urls>",
+      "tabs",
+      "storage",
+      "http://*/*",
+      "https://*/*"
+  ]  
 }
   
