@@ -9,6 +9,7 @@
 let n_of_local_storage = 0;
 let n_of_first_cookies = 0;
 let n_of_third_cookies = 0;
+let n_cookies = 0;
 // =================================================
 
 // =================================================
@@ -78,6 +79,7 @@ function showCookies(tabs){
     // Getting all cookies from the current tab and displaying it
     gettingAllCookies.then((cookies) => {
         let n_cookies = cookies.length;
+        n_cookies = n_cookies;
 
         if (n_cookies > 0) {
             let cookiesText = document.createTextNode("There are " + n_cookies + " cookies injected in this page.");
@@ -132,26 +134,26 @@ function showCookies(tabs){
 function getRating(n_storage, first_cookies, third_cookies){
     // Setting up html elements to receive text about the rating
     let rating = document.getElementById("rating");
+    let cookieScore = n_cookies;
 
-    // Getting the rating
-    let cookieScore = 0;
-    if ((third_cookies + first_cookies) / 50.0 >= 1){
-        cookieScore = 1;
-    }
-
-    if ((n_storage / 50.0) >= 1){
-        n_storage = 1;
-    }
-    var score = (first_cookies/(first_cookies + third_cookies) * 0.55+ cookieScore * 0.35 + n_storage * 0.10)*100;
+    var score = (first_cookies/(first_cookies + third_cookies) * 0.2+ third_cookies/(first_cookies + third_cookies) * 0.4 + cookieScore * 0.3 + n_storage * 0.1)*100;
 
     // Writing into the html
-    let ratingText = document.createTextNode("Privacy Score: " + score + "%");
+    // Reference to round float numbers in JS: https://stackoverflow.com/questions/9453421/how-to-round-float-numbers-in-javascript
+    let ratingText = document.createTextNode("Privacy Score: " + score.toFixed(1));
     rating.appendChild(ratingText);
+    if (score < 150) {
+        rating.style.color = "green";
+    } else if (score < 300) {
+        rating.style.color = "yellow";
+    } else {
+        rating.style.color = "red";
+    }
 }
 // =================================================
 
 // =================================================
-// Executing all functions
+// Executing all functions - Sum of 11 points in total
 // =================================================
 getPresentTab().then(showCookies).then(() => {
     browser.tabs.executeScript({
@@ -162,7 +164,4 @@ getPresentTab().then(showCookies).then(() => {
         getRating(n_of_local_storage, n_of_first_cookies, n_of_third_cookies);
     });
 });
-
-// TODO:
-//       - CRIAR RATING E MOSTRAR NO POPUP
 // =================================================
