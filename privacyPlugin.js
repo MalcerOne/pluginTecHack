@@ -6,9 +6,9 @@
 // =================================================
 // Declaring global variables
 // =================================================
-let n_of_cookies = 0;
 let n_of_local_storage = 0;
-let n_of_third_party_domains = 0;
+let n_of_first_cookies = 0;
+let n_of_third_cookies = 0;
 // =================================================
 
 // =================================================
@@ -62,7 +62,7 @@ function showLocalStorage(storageData) {
 // =================================================
 
 // =================================================
-// Cookies - 2 points
+// Cookies - 2 points + 3 points (first/third party & session/navigation)
 // =================================================
 function showCookies(tabs){
     // Get present tab
@@ -78,7 +78,7 @@ function showCookies(tabs){
     // Getting all cookies from the current tab and displaying it
     gettingAllCookies.then((cookies) => {
         let n_cookies = cookies.length;
-        n_of_cookies = n_cookies;
+
         if (n_cookies > 0) {
             let cookiesText = document.createTextNode("There are " + n_cookies + " cookies injected in this page.");
             cookiesTextHtml.appendChild(cookiesText);
@@ -94,9 +94,29 @@ function showCookies(tabs){
 
             for (let cookie of cookies) {
                 let itemOfUl = document.createElement("li");
-                let textOfLi = document.createTextNode("Cookie: " + cookie.name);
-                itemOfUl.appendChild(textOfLi);
-                cookiesList.appendChild(itemOfUl);
+                let typeOfCookie = "";
+
+                // Knowing if cookie is of type 'session' or 'navigation'
+                if (cookie.session){
+                    typeOfCookie = "session";
+                } else {
+                    typeOfCookie = "navigation";
+                }
+
+                // Knowing if cookie is of type 'first party' or 'third party'
+                let domain = presentTab.url.split('/')[2];
+
+                if ((cookie.domain == domain) || (cookie.domain == "." + domain) || (cookie.domain == "www." + domain) || (cookie.domain == "www" + domain) || ("www." + cookie.domain == domain) || ("www" + cookie.domain == domain)) {
+                    let textOfLi = document.createTextNode("First Party / " + typeOfCookie + " Cookie: " + cookie.name);
+                    itemOfUl.appendChild(textOfLi);
+                    cookiesList.appendChild(itemOfUl);
+                    n_of_first_cookies++;
+                } else {
+                    let textOfLi = document.createTextNode("Third Party / " + typeOfCookie + " Cookie: " + cookie.name);
+                    itemOfUl.appendChild(textOfLi);
+                    cookiesList.appendChild(itemOfUl);
+                    n_of_third_cookies++;
+                }
             }
         } else {
             let cookiesText = document.createTextNode("There are no cookies in this page.");
@@ -106,33 +126,28 @@ function showCookies(tabs){
 }
 // =================================================
 
-// // =================================================
-// // Third Party Domains - 2 points
-// // =================================================
-// const showThirdPartyDomains = async (tabs) =>{
-//     // Get present tab
-//     let presentTab = tabs.pop();
-
-//     // Setting up html elements to receive text about the number of third party domainss
-//     let tpDomainsTextHtml = document.getElementById("thirdPartyDomainsText");
-//     const result = await browser.tabs.sendMessage(presentTab.id, {
-//         method: "getThirdPartthirdPartyDomainsyDomains",
-//     });
-//     let n_tp_domains = result.data[1][1];
-
-//     if (n_tp_domains > 0) {
-//         let tpDomainsText = document.createTextNode("There are " + n_tp_domains + " third party domains in this page.");
-//         tpDomainsTextHtml.appendChild(tpDomainsText);
-//     }
-// }
-// =================================================
-
 // =================================================
 // Create rating for the current tab - 3 points
 // =================================================
-// function getRating(storageData, cookiesData, thirdPartyDomains){
+function getRating(n_storage, first_cookies, third_cookies){
+    // Setting up html elements to receive text about the rating
+    let rating = document.getElementById("rating");
 
-// }
+    // Getting the rating
+    let cookieScore = 0;
+    if ((third_cookies + first_cookies) / 50.0 >= 1){
+        cookieScore = 1;
+    }
+
+    if ((n_storage / 50.0) >= 1){
+        n_storage = 1;
+    }
+    var score = (first_cookies/(first_cookies + third_cookies) * 0.55+ cookieScore * 0.35 + n_storage * 0.10)*100;
+
+    // Writing into the html
+    let ratingText = document.createTextNode("Privacy Score: " + score + "%");
+    rating.appendChild(ratingText);
+}
 // =================================================
 
 // =================================================
@@ -144,10 +159,10 @@ getPresentTab().then(showCookies).then(() => {
     }).then((storageData) => {
         showLocalStorage(storageData[0]);
     }).then(() => {
-        getRating(n_of_local_storage, n_of_cookies, n_of_third_party_domains);
+        getRating(n_of_local_storage, n_of_first_cookies, n_of_third_cookies);
     });
 });
 
-// TODO: - DIFERENCIAR COOKIES DE TERCEIROS E COOKIES DO SITE
+// TODO:
 //       - CRIAR RATING E MOSTRAR NO POPUP
 // =================================================
